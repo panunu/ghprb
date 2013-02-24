@@ -93,7 +93,8 @@ public class GhprbBuild {
 	}
 
 	protected void onStarted() {
-		repo.createCommitStatus(build, GHCommitState.PENDING, (merge ? "Merged build started." : "Build started."),pull);
+        repo.createCommitStatus(build, GHCommitState.PENDING, "Build started", pull);
+
 		try {
 			build.setDescription("<a href=\"" + repo.getRepoUrl()+"/pull/"+pull+"\">Pull request #"+pull+"</a>");
 		} catch (IOException ex) {
@@ -103,16 +104,28 @@ public class GhprbBuild {
 
 	protected void onFinished() {
 		GHCommitState state;
+        String message = getSuccessMessage();
+        
 		if (build.getResult() == Result.SUCCESS) {
 			state = GHCommitState.SUCCESS;
 		} else {
 			state = GHCommitState.FAILURE;
+            message = getFailMessage();
 		}
-		repo.createCommitStatus(build, state, (merge ? "Merged build finished." : "Build finished."),pull );
 
 		String publishedURL = GhprbTrigger.DESCRIPTOR.getPublishedURL();
 		if (publishedURL != null && !publishedURL.isEmpty()) {
-			repo.addComment(pull, "Build results will soon be (or already are) available at: " + publishedURL + build.getUrl());
-		}
+			message = message + " " + publishedURL + build.getUrl();
+        }
+        
+        repo.createCommitStatus(build, state, message, pull);
 	}
+    
+    private String getSuccessMessage() {
+        return ":white_check_mark: Build passed";
+    }
+    
+    private String getFailMessage() {
+        return ":x: Build failed";
+    }
 }
