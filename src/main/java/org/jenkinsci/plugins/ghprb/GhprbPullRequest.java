@@ -79,14 +79,11 @@ public class GhprbPullRequest{
 			sb.append("Previous build stopped.");
 		}
 
-		if(mergeable){
-			sb.append(" Merged build triggered.");
-		}else{
-			sb.append(" Build triggered.");
-		}
-
-		repo.startJob(id,head, mergeable);
+		sb.append("Build starting");
 		
+		repo.startJob(id, head, mergeable);
+		repo.createCommitStatus(head, GHCommitState.PENDING, null, sb.toString(), id);
+
 		Logger.getLogger(GhprbPullRequest.class.getName()).log(Level.INFO, sb.toString());
 	}
 

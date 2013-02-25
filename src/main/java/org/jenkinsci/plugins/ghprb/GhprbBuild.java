@@ -93,8 +93,6 @@ public class GhprbBuild {
 	}
 
 	protected void onStarted() {
-        repo.createCommitStatus(build, GHCommitState.PENDING, "Build started", pull);
-
 		try {
 			build.setDescription("<a href=\"" + repo.getRepoUrl()+"/pull/"+pull+"\">Pull request #"+pull+"</a>");
 		} catch (IOException ex) {
